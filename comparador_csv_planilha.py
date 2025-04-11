@@ -1,32 +1,32 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Comparador de Duplicados com Planilha", layout="centered")
+st.set_page_config(page_title="Comparar Nomes Duplicados com Planilha", layout="centered")
 
-st.title("🔍 Comparar nomes duplicados com nova planilha")
-st.write("Envie um arquivo **CSV com os nomes duplicados** e uma **planilha (.xlsx)** onde esses nomes devem ser buscados (coluna E).")
+st.title("🔍 Comparar nomes duplicados com planilha")
+st.write("Envie um **CSV com nomes duplicados** e uma **planilha Excel (.xlsx)** onde esses nomes devem ser buscados na **coluna E**.")
 
-csv_file = st.file_uploader("📎 Envie o CSV com os nomes duplicados", type="csv")
-xlsx_file = st.file_uploader("📎 Envie a planilha (.xlsx) onde quer buscar os nomes", type="xlsx")
+csv_file = st.file_uploader("📎 CSV com nomes duplicados", type="csv")
+xlsx_file = st.file_uploader("📎 Planilha (.xlsx) para busca", type="xlsx")
 
 if csv_file and xlsx_file:
     try:
-        # Lê os arquivos
+        # Ler arquivos
         duplicados_df = pd.read_csv(csv_file)
         planilha_df = pd.read_excel(xlsx_file)
 
-        # Normaliza os nomes
+        # Normalização dos nomes
         nomes_csv = duplicados_df["Nome"].astype(str).str.strip().str.upper().unique()
         nomes_planilha = planilha_df.iloc[:, 4].astype(str).str.strip().str.upper()  # Coluna E
 
-        # Conjuntos
+        # Comparação
         nomes_encontrados = sorted(set(nomes_csv) & set(nomes_planilha))
         nomes_nao_encontrados = sorted(set(nomes_csv) - set(nomes_planilha))
 
-        st.subheader("✅ Nomes encontrados na nova planilha")
+        st.subheader("✅ Nomes encontrados na planilha")
         st.dataframe(nomes_encontrados)
 
-        st.subheader("❌ Nomes que não foram encontrados")
+        st.subheader("❌ Nomes não encontrados")
         st.dataframe(nomes_nao_encontrados)
 
         # Resultado para download
@@ -36,7 +36,7 @@ if csv_file and xlsx_file:
         })
 
         csv_resultado = resultado.to_csv(index=False).encode("utf-8")
-        st.download_button("📥 Baixar resultado em CSV", csv_resultado, "comparacao_nomes.csv", "text/csv")
+        st.download_button("📥 Baixar resultado em CSV", csv_resultado, "resultado_comparacao.csv", "text/csv")
 
     except Exception as e:
         st.error(f"Erro ao processar os arquivos: {e}")
